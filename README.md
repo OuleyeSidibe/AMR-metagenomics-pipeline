@@ -2,81 +2,98 @@
 
 [![Python 3.10](https://img.shields.io/badge/python-3.10-blue.svg)](https://www.python.org/)
 [![Docker Image](https://img.shields.io/badge/docker-sidibeouleye%2Famr--metagenomic--pipeline%3Av1.0-blue)](https://hub.docker.com/r/sidibeouleye/amr-metagenomic-pipeline)
-[![Tests Coverage](https://img.shields.io/badge/pytest-100%25_coverage-brightgreen.svg)]()
-[![Compliance](https://img.shields.io/badge/FAIR%2FGxP-Compliant-success.svg)]()
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+![Status](https://img.shields.io/badge/status-en%20cours%20(jours%201--2%2F5)-orange.svg)
 
-Un pipeline bioinformatique conteneurisé, testé et reproductible conçu pour la détection automatisée et l'analyse de gènes de résistance aux antimicrobiens (AMR) à partir de données métagénomiques.
+> 🚧 **Projet en cours (jours 1-2 sur 5).** Le socle d'ingénierie logicielle est en place (module Python testé, image Docker publiée). Le workflow Nextflow, le traitement de données métagénomiques réelles et la CI/CD sont **à venir** (voir la [roadmap](#-roadmap-du-projet)).
 
-Ce projet applique les rigueurs de l'ingénierie logicielle (TDD, conteneurisation, gestion défensive des erreurs) aux contraintes des données de génomique microbienne.
+Un projet bioinformatique conteneurisé, testé et reproductible pour la détection et l'analyse de gènes de résistance aux antimicrobiens (AMR) à partir de données métagénomiques.
 
----
-
-## 🚀 Fonctionnalités Principales
-
-- **Détection défensive AMR (`amr_detector.py`) :** Module Python permettant de parser, valider et filtrer les hits de résistance (AMR) avec gestion robuste des anomalies de données (fichiers corrompus, valeurs aberrantes).
-- **Assurance Qualité & Tests (TDD) :** Validation continue du code via `pytest` atteignant une **couverture de code de 100 %** (`pytest-cov`).
-- **Conteneurisation ISO/GxP (`Dockerfile`) :** Environnement d'exécution totalement isolé et reproductible basé sur `python:3.10-slim`, exempt de dépendances hôtes.
-- **Registre Cloud (Docker Hub) :** Image de production compilée et publiée sur Docker Hub (`sidibeouleye/amr-metagenomic-pipeline:v1.0`).
-- **Traçabilité FAIR & GxP :** Documentation stricte des schémas de métadonnées et suivi des versions du code/données (`METADATA.md`).
+Il applique des pratiques d'ingénierie logicielle (développement guidé par les tests, conteneurisation, gestion défensive des erreurs) aux contraintes des données de génomique microbienne.
 
 ---
 
-## 📁 Architecture du Dépôt
+## 🚀 Fonctionnalités actuelles
+
+- **Détection défensive AMR (`amr_detector.py`) :** module Python qui parse, valide et filtre les hits de résistance (AMR), avec une gestion robuste des anomalies de données (fichiers corrompus, valeurs aberrantes).
+- **Tests unitaires :** suite `pytest` avec mesure de couverture (`pytest-cov`) ; couverture de 100 % sur le module actuel (10 instructions).
+- **Conteneurisation (`Dockerfile`) :** environnement d'exécution isolé et reproductible basé sur `python:3.10-slim`, sans dépendance à l'hôte.
+- **Registre Docker Hub :** image `v1.0` publiée sur Docker Hub (`sidibeouleye/amr-metagenomic-pipeline:v1.0`).
+- **Traçabilité des métadonnées :** schémas de métadonnées et suivi des versions du code et des données documentés dans `docs/METADATA.md`, en s'inspirant des principes FAIR.
+
+## ⚠️ Limites actuelles
+
+- Le dépôt ne traite pas encore de fichiers FASTQ/BAM : le module travaille sur des tables de hits AMR déjà produites.
+- Pas encore d'orchestration de workflow (Nextflow prévu) ni d'intégration continue (GitHub Actions prévu).
+- Le badge de couverture sera ajouté une fois la CI en place, pour qu'il reflète une exécution réelle.
+
+---
+
+## 📁 Architecture du dépôt
 
 ```text
 amr-metagenomic-pipeline/
 ├── src/
 │   ├── __init__.py           # Package Python amr_pipeline
-│   └── amr_detector.py       # Logique métier d'analyse des hits AMR
+│   └── amr_detector.py       # Logique d'analyse des hits AMR
 ├── tests/
 │   ├── __init__.py
 │   └── test_amr_detector.py  # Tests unitaires et cas aux limites (pytest)
 ├── docs/
-│   └── METADATA.md           # Spécifications de traçabilité FAIR/GxP
+│   └── METADATA.md           # Spécifications de traçabilité des métadonnées
 ├── .dockerignore             # Exclusions pour l'optimisation du build Docker
-├── Dockerfile                # Recette de conteneurisation de production
+├── Dockerfile                # Recette de conteneurisation
 ├── pyproject.toml            # Configuration du package Python (PEP 517/518)
-├── requirements.txt          # Dépendances système et de test
+├── requirements.txt          # Dépendances d'exécution et de test
+└── README.md
+```
 
-🛠️ Installation et Exécution
-Option 1 : Exécution directe via Docker (Recommandé)
+---
 
-Aucune installation préalable de Python, pytest ou dépendances locales n'est nécessaire. L'image télécharge et exécute automatiquement l'environnement de production.
-Bash
+## 🛠️ Installation et exécution
 
-# 1. Récupérer l'image validée depuis Docker Hub
+### Option 1 : exécution via Docker (recommandé)
+
+Aucune installation préalable de Python, pytest ou d'autres dépendances n'est nécessaire.
+
+```bash
+# 1. Récupérer l'image depuis Docker Hub
 docker pull sidibeouleye/amr-metagenomic-pipeline:v1.0
 
-# 2. Exécuter le conteneur (lance la suite complète de tests)
+# 2. Exécuter le conteneur (lance la suite de tests)
 docker run --rm sidibeouleye/amr-metagenomic-pipeline:v1.0
+```
 
-Option 2 : Environnement de développement local
+### Option 2 : environnement de développement local
 
-Si vous souhaitez modifier le code source ou ajouter des fonctionnalités :
-1. Prérequis & Clonnage
-Bash
+Pour modifier le code source ou ajouter des fonctionnalités.
 
-git clone [https://github.com/sidibeouleye/amr-metagenomic-pipeline.git](https://github.com/sidibeouleye/amr-metagenomic-pipeline.git)
-cd amr-metagenomic-pipeline
+**1. Cloner le dépôt**
 
-2. Installation des dépendances
-Bash
+```bash
+git clone https://github.com/OuleyeSidibe/AMR-metagenomics-pipeline.git
+cd AMR-metagenomics-pipeline
+```
 
-# Installation des paquets requis
+**2. Installer les dépendances**
+
+```bash
+# Paquets requis
 pip install -r requirements.txt
 
-# Installation du paquet local en mode éditable
+# Paquet local en mode éditable
 pip install -e .
+```
 
-3. Exécution de la suite de tests unitaires
-Bash
+**3. Lancer les tests unitaires**
 
+```bash
 python -m pytest --cov=src tests/
+```
 
 Résultat attendu :
-Plaintext
 
+```text
 ============================== test session starts ==============================
 collected 2 items
 
@@ -91,33 +108,33 @@ src/amr_detector.py      10      0   100%
 TOTAL                    10      0   100%
 
 =============================== 2 passed in 0.08s ===============================
+```
 
-⚙️ Détails Techniques de la Conteneurisation
+---
 
-L'image Docker a été conçue en respectant les standards industriels :
+## ⚙️ Détails de la conteneurisation
 
-    Minimisation de la surface d'attaque : Utilisation de l'image officielle python:3.10-slim.
+- **Image légère :** base officielle `python:3.10-slim`.
+- **Couches allégées :** suppression des caches apt et pip (`--no-cache-dir`) pour réduire la taille de l'image.
+- **Résolution des modules :** variable `PYTHONPATH=/app` pour que les modules internes soient trouvés indépendamment des chemins de l'hôte.
 
-    Nettoyage des couches (Layers) : Suppression explicite des caches apt et pip (--no-cache-dir) pour réduire la taille globale de l'image.
+---
 
-    Sécurisation du runtime : Variable PYTHONPATH=/app injectée pour garantir la résolution native des modules internes sans dépendre de chemins relatifs hôtes.
+## 📝 Roadmap du projet
 
-📝 Roadmap du Projet 
+| Jalon | Contenu | Statut | Date |
+|---|---|---|---|
+| Jour 1 | Architecture logicielle, programmation défensive, tests unitaires (100 % de couverture) | ✅ Terminé | [JJ/MM/AAAA] |
+| Jour 2 | Conteneurisation Docker, optimisation du build, publication sur Docker Hub | ✅ Terminé | [JJ/MM/AAAA] |
+| Jour 3 | Orchestration multi-étapes avec Nextflow (DSL2) et intégration Docker | ⏳ À venir | [JJ/MM/AAAA] |
+| Jour 4 | Traitement de données métagénomiques (FASTQ/BAM) et parallélisation | ⏳ À venir | [JJ/MM/AAAA] |
+| Jour 5 | CI/CD avec GitHub Actions (lint, tests, build et push Docker) et badge de couverture réel | ⏳ À venir | [JJ/MM/AAAA] |
 
-    [x] Jour 1 : Architecture logicielle, programmation défensive et tests unitaires (100% coverage).
+---
 
-    [x] Jour 2 : Conteneurisation Docker, optimisation de build et déploiement Docker Hub.
+## 👤 Auteur
 
-    [ ] Jour 3 : Orchestration de workflow multi-étapes avec Nextflow (DSL2) & intégration Docker.
+**Dr. Ouleye Sidibé** : Bioinformatics Engineer / Microbial Genomics Specialist
 
-    [ ] Jour 4 : Traitement de données métagénomiques haute densité (FASTQ/BAM) et parallélisation.
-
-    [ ] Jour 5 : Automatisation CI/CD via GitHub Actions (Linting, Test, Docker Build & Push).
-
-👤 Auteur
-
-Dr. Ouleye Sidibé — Bioinformatics Engineer / Microbial Genomics Specialist
-
-    GitHub : @sidibeouleye
-
-    Docker Hub : sidibeouleye
+- GitHub : [@OuleyeSidibe](https://github.com/OuleyeSidibe)
+- Docker Hub : [sidibeouleye](https://hub.docker.com/u/sidibeouleye)
